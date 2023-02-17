@@ -80,7 +80,7 @@ GunGraphData nodeToGraph(GunNode node) {
     }
   }
 
-  print('SD:: ${modified.toString()} $nodeSoul');
+  // print('SD:: ${modified.toString()} $nodeSoul');
 
   GunGraphData raw = GunGraphData();
   raw[nodeSoul!] = GunNode.fromJson(modified);
@@ -130,7 +130,7 @@ PathData getPathData(List<String> keys, GunGraphData graph) {
         value: null);
   }
 
-  final value = (getPathDataParent.value as GunNode)[lastKey];
+  final value = getPathDataParent.value[lastKey];
 
   if (isNull(value)) {
     return PathData(

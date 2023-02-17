@@ -58,21 +58,41 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     ChainGunOptions chainGunOptions = ChainGunOptions();
-    chainGunOptions.peers = ['ws://localhost:8080/gun'];
+    const isLocal = true;
+    chainGunOptions.peers = [ isLocal ? 'ws://localhost:8080/gun' : 'wss://gun-manhattan.herokuapp.com/gun'];
     final chainGunClient = ChainGunClient(chainGunOptions: chainGunOptions);
 
-    copy = chainGunClient.get('filegot1').get('paste1').get('key1').get('key2');
+    copy = chainGunClient.get('filegot1').get('pastes1').get('paste2');
 
-    copy.on((a, [b, c]) {
-      print('ASD:: $a');
+    final pasteJust = copy.get('paste').get('just');
+    final doingMaybe = copy.get('doing');
+
+    pasteJust.on((a, [b, c]) {
+      print('pasteJust:::: $a');
       setState(() {
-        if (a != null && a is String) {
+        if (a != null) {
           gundbText = a;
           if (gundbText != gunDBTestingController.text) {
             gunDBTestingController.text = gundbText;
           }
         }
       });
+    });
+
+    doingMaybe.on((a, [b, c]) {
+      print('doingMaybe:: $a');
+
+      if (a != null && a['maybe'] == false) {
+        copy.put({
+          'doing': {
+            'maybe': true
+          }
+        });
+      }
+    });
+
+    copy.on((a, [b, c]) {
+      print('ASD:: $a');
     });
   }
 
@@ -127,7 +147,14 @@ class _MyHomePageState extends State<MyHomePage> {
                 //fillColor: Colors.green
               ),
               onChanged: (val) {
-                copy.put({ 'paste': val });
+                copy.put({ 'paste': {
+                    'just': val,
+                    'more': { 'no': 2 }
+                  },
+                  'doing': {
+                    'maybe': false
+                  }
+                });
               },
             ),
           ],

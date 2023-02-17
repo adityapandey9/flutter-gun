@@ -57,7 +57,7 @@ class WebSocketGraphConnector extends GunGraphWireConnector {
   }
 
   void _onReceiveSocketData(dynamic msg) {
-    print('Received Msg: $msg');
+    // print('Received Msg: $msg');
     final json = jsonDecode(msg);
     // print('\n\nReceived Msg:---:: $json');
 

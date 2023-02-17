@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:convert';
 
 import '../../crdt/index.dart';
@@ -204,6 +205,75 @@ class GunGraph {
       return path.join('/');
   }
 
+  GunGraphData _getPutPathGunGraph(List<String> souls, GunValue data) {
+    // Create a new Map for the converted JSON
+    GunGraphData data2 = GunGraphData();
+    var data1 = {};
+    var temp = data1;
+    for (var i = 0; i < souls.length; i++) {
+      if (i != souls.length - 1) {
+        temp[souls[i]] = {};
+        temp = temp[souls[i]];
+      } else {
+        temp[souls[i]] = data;
+      }
+    }
+
+    // Create a queue to store the keys and values that need to be processed
+    var queue = Queue();
+    var pathQueue = Queue();
+
+    // Add the root data to the queue
+    queue.addAll(data1.entries);
+    for (var i = 0; i < data1.entries.length; i++) {
+      pathQueue.add("");
+    }
+
+    // Keep processing the keys and values in the queue until it is empty
+    while (queue.isNotEmpty) {
+      // Get the next key and value from the queue
+      var entry = queue.removeFirst();
+      var key = entry.key;
+      var value = entry.value;
+      var path = "";
+      if (pathQueue.isNotEmpty) {
+        path = pathQueue.removeFirst();
+      }
+      // Concatenate the current key to the path
+      var currentPath = path.isEmpty ? key : '$path/$key';
+
+      // Check if the value is a Map (i.e. another nested dictionary)
+      if (value is Map) {
+        // If it is a Map, create a new Map for the converted data
+        Map<String, dynamic> currentData2 = {};
+
+        // Add the metadata to the Map
+        currentData2['_'] = {'#': currentPath, '>': {}};
+
+        for (final entry in value.entries) {
+          currentData2['_']['>'][entry.key] =
+              DateTime.now().millisecondsSinceEpoch;
+          if (entry.value is Map) {
+            currentData2[entry.key] = {"#": "$currentPath/${entry.key}"};
+          } else {
+            currentData2[entry.key] = entry.value;
+          }
+        }
+
+        // Add the Map to the converted data
+        data2[currentPath] = GunNode.fromJson(currentData2);
+
+        // Add the nested data to the queue
+        queue.addAll(value.entries);
+        for (var i = 0; i < value.entries.length; i++) {
+          pathQueue.add(currentPath);
+        }
+      }
+    }
+
+    return data2;
+  }
+
   /// Write graph data to a potentially multi-level deep path in the graph
   ///
   /// @param path The path to read
@@ -216,68 +286,24 @@ class GunGraph {
     if (fullPath.isEmpty) {
       throw ("No path specified");
     }
-    print('<<<<<<Updating:0>>>>>>>>:: $_graph, ${_graph.keys}, ${jsonEncode(_graph)}');
-    final souls = await getPathSouls(fullPath);
+    // final souls = await getPathSouls(fullPath);
+    // if (souls.length == fullPath.length && data is! GunNode) {
+    //   _graph.clear();
+    //   souls.removeLast();
+    // }
 
-    print(
-        'Sou:: ${souls.length} -- ${fullPath.length} - ${fullPath.toString()} -- ${data.toString()}');
+    // if (souls.length == fullPath.length) {
+    //   GunGraphData gunGraphData = GunGraphData();
+    //   GunNode gunNode = GunNode(
+    //     nodeMetaData: GunNodeMeta(),
+    //   );
+    //   gunNode.merge(data);
+    //   gunGraphData[souls[souls.length - 1]] = gunNode;
+    //   put(gunGraphData, cb);
+    //   return;
+    // }
 
-    if (souls.length == fullPath.length && data is! GunNode) {
-      _graph.clear();
-      souls.removeLast();
-    }
-
-    if (souls.length == fullPath.length) {
-      GunGraphData gunGraphData = GunGraphData();
-      GunNode gunNode = GunNode(
-        nodeMetaData: GunNodeMeta(),
-      );
-      gunNode.merge(data);
-      gunGraphData[souls[souls.length - 1]] = gunNode;
-      put(gunGraphData, cb);
-      return;
-    }
-
-    final existing = fullPath.sublist(0, souls.length);
-    final remaining = fullPath.sublist(souls.length);
-    String previousSoul = souls[souls.length - 1];
-    GunGraphData graph = GunGraphData();
-
-    for (var i = 0; i < remaining.length; i++) {
-      final now = DateTime.now().millisecondsSinceEpoch;
-      final key = remaining[i];
-      GunValue chainVal;
-      String soul = '';
-
-      if (i == remaining.length - 1) {
-        chainVal = data;
-      } else {
-        soul = await uuidFn([...existing, ...remaining.sublist(0, i + 1)]);
-        chainVal = {
-          "#": soul
-        };
-      }
-
-      GunNodeState gunNodeState = GunNodeState();
-      gunNodeState[key] = now;
-
-      graph[previousSoul] = GunNode(nodeMetaData: GunNodeMeta(key: previousSoul, forward: gunNodeState));
-
-      graph[previousSoul]![key] = chainVal;
-      // graph[previousSoul] = GunNode.fromJson({
-      //   "_": {
-      //     "#": previousSoul,
-      //     ">": {
-      //       [key]: now
-      //     }
-      //   },
-      //   [key]: chainVal
-      // });
-
-      if (soul.isNotEmpty) {
-        previousSoul = soul;
-      }
-    }
+    GunGraphData graph = _getPutPathGunGraph(fullPath, data);
 
     put(graph, cb);
   }
@@ -290,7 +316,6 @@ class GunGraph {
     }
 
     List<String> lastSouls = [];
-    print('<<<<<<Updating:1>>>>>>>>:: $_graph, ${_graph.keys}, ${jsonEncode(_graph)}');
 
     updateQuery(GunNode? _, [dynamic __, dynamic ___]) {
       PathData getPathDataList = getPathData(path, _graph);
