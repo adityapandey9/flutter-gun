@@ -1,39 +1,58 @@
-<!-- 
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+## Flutter GunDB
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/guides/libraries/writing-package-pages). 
+This library is a port of GunDB js for the Dart and Flutter. P2P encrypted Communication between multiple users.
+Flutter GUN is an ecosystem of tools that let you build community run and encrypted applications - like an Open Source Firebase or a Decentralized Dropbox.
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-library-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/developing-packages). 
--->
-
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
-
+`Note: Some APIs like certify and user, not implemented completely (Trying to do so ;) )`
 ## Features
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+1. Multiplayer by default with realtime p2p state synchronization!
+2. Graph data lets you use key/value, tables, documents, videos, & more!
+3. Local-first, offline, and decentralized with end-to-end encryption.
+
+Decentralized alternatives to Zoom, Reddit, Instagram, Slack, YouTube, Stripe, Wikipedia, Facebook Horizon and
+more have already pushed terabytes of daily P2P traffic on GUN.
 
 ## Getting started
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+Add library to your app.
+
+```
+flutter pub add flutter_gundb
+```
+
+or
+
+```yaml
+.....
+dependencies:
+  flutter_gundb: ^0.0.1
+....
+```
 
 ## Usage
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder. 
+Short example is below. Added longer examples to `/example` folder.
 
 ```dart
-const like = 'sample';
+import 'package:flutter_gundb/flutter_gundb.dart';
+
+void main() {
+    final chainGunClient = FlutterGunSeaClient();
+    
+    final getAditya = gun.get('aditya');
+    getAditya.put({
+      name: "Aditya Kumar Pandey",
+      email: "janatig@janatig.com",
+    });
+    getAditya.on((a, [b, c]) {
+      print('Getting Value:: $a');
+    });
+}
+
 ```
 
 ## Additional information
 
-TODO: Tell users more about the package: where to find more information, how to 
-contribute to the package, how to file issues, what response they can expect 
-from the package authors, and more.
+Some APIs like `certify` and `user`. If anyone wants to help, kindly send a PR. I would appreciate it. Thank you in advance :)
+
