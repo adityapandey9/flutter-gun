@@ -1,6 +1,6 @@
 name: flutter_gundb
 description: A gunDB port P2P encrypted Communication between multiple users.
-version: 0.0.1
+version: 0.0.2
 homepage: https://janatig.com/
 repository: https://github.com/adityapandey9/flutter-gun
 issue_tracker: https://github.com/adityapandey9/flutter-gun/issues
