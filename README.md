@@ -26,7 +26,7 @@ or
 ```yaml
 .....
 dependencies:
-  flutter_gundb: ^0.0.1
+  flutter_gundb: ^0.0.2
 ....
 ```
 
