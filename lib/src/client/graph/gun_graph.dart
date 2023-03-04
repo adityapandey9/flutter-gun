@@ -84,6 +84,10 @@ class GunGraph {
     return this;
   }
 
+  GunGraphOptions getOpt() {
+    return _opt;
+  }
+
   /// Connect to a source/destination for graph data
   ///
   /// @param connector the source or destination for graph data
@@ -240,7 +244,7 @@ class GunGraph {
         path = pathQueue.removeFirst();
       }
       // Concatenate the current key to the path
-      var currentPath = path.isEmpty ? key : '$path/$key';
+      var currentPath = path.isEmpty ? key : path.contains("~@") ? key : '$path/$key';
 
       // Check if the value is a Map (i.e. another nested dictionary)
       if (value is Map) {
@@ -254,7 +258,7 @@ class GunGraph {
           currentData2['_']['>'][entry.key] =
               DateTime.now().millisecondsSinceEpoch;
           if (entry.value is Map) {
-            currentData2[entry.key] = {"#": "$currentPath/${entry.key}"};
+            currentData2[entry.key] = {"#": currentPath.contains("~@") ? entry.key : "$currentPath/${entry.key}"};
           } else {
             currentData2[entry.key] = entry.value;
           }
@@ -286,22 +290,6 @@ class GunGraph {
     if (fullPath.isEmpty) {
       throw ("No path specified");
     }
-    // final souls = await getPathSouls(fullPath);
-    // if (souls.length == fullPath.length && data is! GunNode) {
-    //   _graph.clear();
-    //   souls.removeLast();
-    // }
-
-    // if (souls.length == fullPath.length) {
-    //   GunGraphData gunGraphData = GunGraphData();
-    //   GunNode gunNode = GunNode(
-    //     nodeMetaData: GunNodeMeta(),
-    //   );
-    //   gunNode.merge(data);
-    //   gunGraphData[souls[souls.length - 1]] = gunNode;
-    //   put(gunGraphData, cb);
-    //   return;
-    // }
 
     GunGraphData graph = _getPutPathGunGraph(fullPath, data);
 
@@ -323,14 +311,14 @@ class GunGraph {
       List<String> souls = getPathDataList.souls;
       bool complete = getPathDataList.complete;
 
-      print('updateQuery: ${souls.toString()} -- $complete');
+      // print('updateQuery: ${souls.toString()} -- $complete');
 
       final diffSetsList = diffSets(lastSouls, souls);
 
       dynamic added = diffSetsList[0];
       dynamic removed = diffSetsList[1];
 
-      print('diffSetsList:: ${added.toString()} -- ${removed.toString()}');
+      // print('diffSetsList:: ${added.toString()} -- ${removed.toString()}');
 
       end() {
         for (final soul in lastSouls) {
@@ -398,7 +386,7 @@ class GunGraph {
         return;
       }
       
-      print('Data-->Encoded::Sent:: ${jsonEncode(diff)}');
+      // print('Data-->Encoded::Sent:: ${jsonEncode(diff)}');
 
       events.put.trigger(ChainGunPut(graph: diff!, cb: cb, msgId: id));
 

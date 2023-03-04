@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter_gundb/types/gun_graph_adapter.dart';
+import '../types/gun_graph_adapter.dart';
 
 import '../types/chain_gun.dart';
 import '../types/gun.dart';
@@ -79,7 +79,7 @@ class ChainGunLink {
   /// @param cb an optional callback, invoked on each acknowledgment
   /// @returns same chain context
   ChainGunLink put(GunValue value, [GunMsgCb? cb]) {
-    _chain.graph.putPath(getPath(), value, cb, opt().uuid);
+    _chain.graph!.putPath(getPath(), value, cb, opt().uuid);
     return this;
   }
 
@@ -94,11 +94,13 @@ class ChainGunLink {
   /// @returns chain context for added object
   ChainGunLink set(dynamic data, [GunMsgCb? cb]) {
     if (data is ChainGunLink && !isNull(data.soul)) {
-      put({
-        data.soul: {'#': data.soul}
-      }, cb);
+      final temp = {};
+      temp[data.soul] = {'#': data.soul};
+      put(temp, cb);
     } else if (data is GunNode) {
-      put({data.nodeMetaData?.key: data}, cb);
+      final temp = {};
+      temp[data.nodeMetaData?.key] = data;
+      put(temp, cb);
     } else {
       throw ('set() is only partially supported');
     }
@@ -161,7 +163,7 @@ class ChainGunLink {
 
     _updateEvent.on(cb);
     if (isNull(_endQuery)) {
-      _endQuery = _chain.graph.query(getPath(), _onQueryResponse);
+      _endQuery = _chain.graph!.query(getPath(), _onQueryResponse);
     }
     if (_hasReceived) {
       cb(_lastValue, key);
@@ -172,7 +174,7 @@ class ChainGunLink {
   /// Unsubscribe one or all listeners subscribed with on
   ///
   /// @returns same chain context
-  ChainGunLink off(GunOnCb? cb) {
+  ChainGunLink off([GunOnCb? cb]) {
     if (!isNull(cb)) {
       _updateEvent.off(cb!);
       if (!isNull(_endQuery) && _updateEvent.listenerCount() == 0) {

@@ -1,4 +1,6 @@
-import 'package:flutter_gundb/client/transports/web_socket_graph_connector.dart';
+import 'dart:async';
+
+import '../client/transports/web_socket_graph_connector.dart';
 
 import '../crdt/index.dart';
 import '../types/chain_gun.dart';
@@ -23,17 +25,28 @@ class ChainGunOptions {
 }
 
 class ChainGunClient {
-  late final GunGraph graph;
-  late final ChainGunOptions _opt;
+  GunGraph? graph;
+  late ChainGunOptions _opt;
   ChainGunLink? linkClass;
 
   ChainGunClient({this.linkClass, ChainGunOptions? chainGunOptions}) {
+    initializedClient(linkClass: linkClass, chainGunOptions: chainGunOptions);
+  }
+
+  initializedClient({linkClass, ChainGunOptions? chainGunOptions}) {
+    print('Initia::000');
+    if (chainGunOptions?.peers == null) {
+      return;
+    }
+    this.linkClass = linkClass;
+    print('Initia::111');
+
     if (!isNull(chainGunOptions) && !isNull(chainGunOptions?.graph)) {
       graph = chainGunOptions!.graph!;
     } else {
       graph = GunGraph();
-      graph.use(diffGunCRDT);
-      graph.use(diffGunCRDT, kind: ChainGunMiddlewareType.write);
+      graph!.use(diffGunCRDT);
+      graph!.use(diffGunCRDT, kind: ChainGunMiddlewareType.write);
     }
     _opt = ChainGunOptions();
     if (!isNull(chainGunOptions)) {
@@ -50,9 +63,9 @@ class ChainGunClient {
     if (options.peers.isNotEmpty) {
       for (var peer in options.peers) {
         final connector = WebSocketGraphConnector(url: peer);
-        connector.sendPutsFromGraph(graph);
-        connector.sendRequestsFromGraph(graph);
-        graph.connect(connector);
+        connector.sendPutsFromGraph(graph!);
+        connector.sendRequestsFromGraph(graph!);
+        graph!.connect(connector);
       }
     }
 
@@ -66,5 +79,20 @@ class ChainGunClient {
   /// @returns New chain context corresponding to given key
   ChainGunLink get(String soul, [GunMsgCb? cb]) {
     return linkClass = ChainGunLink(key: soul, chain: this);
+  }
+
+  /// Traverse a location in the graph and Return the data
+  ///
+  /// @param key Key to read data from
+  /// @param cb
+  /// @returns New chain context corresponding to given key
+  Future<dynamic> getValue(String soul, [GunMsgCb? cb]) async {
+    final tempFlutterGunLink = ChainGunLink(key: soul, chain: this);
+    var completer = Completer<dynamic>();
+    tempFlutterGunLink.once((a, [b, c]) {
+      completer.complete(a);
+    });
+
+    return completer.future;
   }
 }

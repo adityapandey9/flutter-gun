@@ -1,6 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_gundb/client/chain_gun_client.dart';
-import 'package:flutter_gundb/client/chain_gun_link.dart';
+import 'package:flutter_gundb/flutter_gundb.dart';
 
 void main() {
   runApp(const MyApp());
@@ -60,9 +61,9 @@ class _MyHomePageState extends State<MyHomePage> {
     ChainGunOptions chainGunOptions = ChainGunOptions();
     const isLocal = true;
     chainGunOptions.peers = [ isLocal ? 'ws://localhost:8080/gun' : 'wss://gun-manhattan.herokuapp.com/gun'];
-    final chainGunClient = ChainGunClient(chainGunOptions: chainGunOptions);
+    final chainGunClient = ChainGunSeaClient(chainGunOptions: chainGunOptions);
 
-    copy = chainGunClient.get('filegot1').get('pastes1').get('paste2');
+    copy = chainGunClient.get('filegot2');
 
     final pasteJust = copy.get('paste').get('just');
     final doingMaybe = copy.get('doing');
@@ -79,8 +80,50 @@ class _MyHomePageState extends State<MyHomePage> {
       });
     });
 
-    doingMaybe.on((a, [b, c]) {
+    doingMaybe.on((a, [b, c]) async {
       print('doingMaybe:: $a');
+      final pairVar = await pair();
+      var enc = await encrypt('hello self', pairVar);
+      print('Encr:: $enc');
+      var data = await sign('Hello, YO!!', pairVar);
+      print('Data:: $data');
+
+      var msg = await verify(data, pairVar);
+      print('Verifying:: $msg');
+      var dec = await decrypt(msg, pairVar);
+      var proof = await work(dec, pairVar);
+      var check = await work('hello self', pairVar);
+      print('Decrypt MSG:: $dec');
+      print('Val:: ${proof == check} -- $proof -- $check');
+
+      var alice = await pair();
+      var bob = await pair();
+      var shared = await secret(bob.epub, alice);
+      print('\nSharedd:: $shared');
+      var shared_enc = await encrypt('shared data', shared);
+      print('\nshared_enc :: $shared_enc');
+
+      var decryptKey = await secret(alice.epub, bob);
+      print('\decryptKey:: $decryptKey');
+
+      var dec2 = await decrypt(shared_enc, decryptKey);
+      print('\n\nDecrpted Data:: $dec2');
+
+      // var certificate = await certify(alice.pub, ["^AliceOnly.*"], bob);
+
+      // final user = await chainGunClient.user().create(alice.pub, alice.epriv);
+
+      // print('Got User:: ${jsonEncode(user)}');
+
+      // await chainGunClient.user().auth(alias: alice.pub, password: alice.epriv);
+
+      // final testKey = chainGunClient.get('~${bob.pub}').get('AliceOnly').get('do-not-tell-anyone');
+      //
+      // testKey.put({ 'data': shared_enc, 'cert': certificate });
+      //
+      // testKey.once((a, [b, c]) {
+      //   print('Getting Once the data:: $a, $b, $c');
+      // });
 
       if (a != null && a['maybe'] == false) {
         copy.put({

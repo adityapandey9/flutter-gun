@@ -1,4 +1,4 @@
-import 'package:flutter_gundb/types/gun_graph_adapter.dart';
+import '../../types/gun_graph_adapter.dart';
 
 import '../../types/gun.dart';
 import '../control_flow/gun_event.dart';

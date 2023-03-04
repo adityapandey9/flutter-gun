@@ -41,7 +41,7 @@ class WebSocketGraphConnector extends GunGraphWireConnector {
     if (msgs.isEmpty) {
       return msgs;
     }
-    print('Sending It:: ${msgs.length} ${jsonEncode(msgs[0])}');
+    // print('Sending It:: ${msgs.length} ${jsonEncode(msgs[0])}');
     if (msgs.length == 1) {
       _ws.sink.add(jsonEncode(msgs[0]));
     } else if (msgs.length > 1) {
