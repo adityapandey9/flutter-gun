@@ -1,7 +1,7 @@
 ## Flutter GunDB
 
 This library is a port of GunDB js for the Dart and Flutter. P2P encrypted Communication between multiple users.
-Flutter GUN is an ecosystem of tools that let you build community run and encrypted applications - like an Open Source Firebase or a Decentralized Dropbox.
+GUN is an ecosystem of tools that let you build community run and encrypted applications - like an Open Source Firebase or a Decentralized Dropbox.
 
 `Note: Some APIs like certify and user, not implemented completely (Trying to do so ;) )`
 ## Features
