@@ -52,6 +52,45 @@ void main() {
 
 ```
 
+Example How to send other user encrypted data
+
+```dart
+import 'package:flutter_gundb/flutter_gundb.dart';
+
+void main() {
+    final chainGunClient = FlutterGunSeaClient();
+    
+    final getAditya = gun.get('aditya');
+
+    () async {
+      var aditya = await pair();
+      var pandey = await pair();
+
+      // On Aditya
+      var shared = await secret(pandey.epub, aditya);
+      var shared_enc = await encrypt('<Your Shared Data>', shared);
+      
+      // Now Share `shared_enc` to your friend pandey (Send shared_enc and aditya's public key)
+      
+      // On Pandey Side
+
+      var decryptKey = await secret(aditya.epub, pandey);
+      var decryptedData = await decrypt(shared_enc, decryptKey);
+      
+      // `decryptedData` This is your Decrypted Data
+      
+      getAditya.put({
+        name: "Aditya Kumar Pandey",
+        email: "janatig@janatig.com",
+      });
+      getAditya.on((a, [b, c]) {
+        print('Getting Value:: $a');
+      });
+    } ();
+}
+
+```
+
 ## Additional information
 
 Some APIs like `certify` and `user`. If anyone wants to help, kindly send a PR. I would appreciate it. Thank you in advance :)

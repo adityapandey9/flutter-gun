@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:collection';
-import 'dart:convert';
 
 import '../../crdt/index.dart';
 import '../../types/flutter_gun.dart';
