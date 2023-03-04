@@ -1,6 +1,6 @@
 import '../../types/gun.dart';
 
-import '../../types/chain_gun.dart';
+import '../../types/flutter_gun.dart';
 import '../../types/gun_graph_adapter.dart';
 import '../graph/gun_graph_utils.dart';
 import 'gun_graph_wire_connector.dart';
@@ -15,25 +15,25 @@ class GunGraphConnectorFromAdapter extends GunGraphWireConnector {
       {required this.adapter, this.name = 'GunGraphConnectorFromAdapter'});
 
   @override
-  VoidCallback get(ChainGunGet chainGunGet, [dynamic _, dynamic __]) {
-    adapter.get(chainGunGet.soul).then((node) {
+  VoidCallback get(FlutterGunGet flutterGunGet, [dynamic _, dynamic __]) {
+    adapter.get(flutterGunGet.soul).then((node) {
       GunGraphData gunGraphData = GunGraphData();
-      gunGraphData[chainGunGet.soul] = node;
+      gunGraphData[flutterGunGet.soul] = node;
       return GunMsg(
           key: generateMessageId(),
-          pos: chainGunGet.msgId ?? '',
+          pos: flutterGunGet.msgId ?? '',
           put: !isNull(node) ? gunGraphData : null);
     }).catchError((err) {
       print(err);
 
       return GunMsg(
           key: generateMessageId(),
-          pos: chainGunGet.msgId ?? '',
+          pos: flutterGunGet.msgId ?? '',
           err: 'Error fetching node');
     }).then((msg) {
       ingest([msg]);
-      if (!isNull(chainGunGet.cb)) {
-        chainGunGet.cb!(msg);
+      if (!isNull(flutterGunGet.cb)) {
+        flutterGunGet.cb!(msg);
       }
     });
 
@@ -41,12 +41,12 @@ class GunGraphConnectorFromAdapter extends GunGraphWireConnector {
   }
 
   @override
-  VoidCallback put(ChainGunPut chainGunPut, [dynamic _, dynamic __]) {
+  VoidCallback put(FlutterGunPut flutterGunPut, [dynamic _, dynamic __]) {
     adapter
-        .put(chainGunPut.graph)
+        .put(flutterGunPut.graph)
         .then((node) => GunMsg(
             key: generateMessageId(),
-            pos: chainGunPut.msgId ?? '',
+            pos: flutterGunPut.msgId ?? '',
             err: null,
             ok: true))
         .catchError((err) {
@@ -54,13 +54,13 @@ class GunGraphConnectorFromAdapter extends GunGraphWireConnector {
 
       return GunMsg(
           key: generateMessageId(),
-          pos: chainGunPut.msgId ?? '',
+          pos: flutterGunPut.msgId ?? '',
           err: 'Error saving put',
           ok: false);
     }).then((msg) {
       ingest([msg]);
-      if (!isNull(chainGunPut.cb)) {
-        chainGunPut.cb!(msg);
+      if (!isNull(flutterGunPut.cb)) {
+        flutterGunPut.cb!(msg);
       }
     });
 

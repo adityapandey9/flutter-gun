@@ -3,7 +3,7 @@ import 'dart:collection';
 import 'dart:convert';
 
 import '../../crdt/index.dart';
-import '../../types/chain_gun.dart';
+import '../../types/flutter_gun.dart';
 import '../../types/enum.dart';
 import '../../types/generic.dart';
 import '../../types/gun.dart';
@@ -24,8 +24,8 @@ typedef GraphConnectorFuncType = void Function(GunGraphConnector connector);
 class GunGraphEvent {
   final GunEvent<GunGraphData, String?, String?> graphData;
 
-  final GunEvent<ChainGunPut, dynamic, dynamic> put;
-  final GunEvent<ChainGunGet, dynamic, dynamic> get;
+  final GunEvent<FlutterGunPut, dynamic, dynamic> put;
+  final GunEvent<FlutterGunGet, dynamic, dynamic> get;
   final GunEvent<String, dynamic, dynamic> off;
 
   GunGraphEvent(
@@ -48,9 +48,9 @@ class GunGraph {
 
   late final List<GunGraphConnector> _connectors;
 
-  late final List<ChainGunMiddleware> _readMiddleware;
+  late final List<FlutterGunMiddleware> _readMiddleware;
 
-  late final List<ChainGunMiddleware> _writeMiddleware;
+  late final List<FlutterGunMiddleware> _writeMiddleware;
 
   late final GunGraphData _graph;
 
@@ -61,9 +61,9 @@ class GunGraph {
     activeConnectors = 0;
     events = GunGraphEvent(
       graphData: GunEvent<GunGraphData, String?, String?>(name: 'graph data'),
-      get: GunEvent<ChainGunGet, dynamic, dynamic>(name: 'request soul'),
+      get: GunEvent<FlutterGunGet, dynamic, dynamic>(name: 'request soul'),
       off: GunEvent<String, dynamic, dynamic>(name: 'off event'),
-      put: GunEvent<ChainGunPut, dynamic, dynamic>(name: 'put data'),
+      put: GunEvent<FlutterGunPut, dynamic, dynamic>(name: 'put data'),
     );
     _opt = GunGraphOptions();
     _opt.mutable = MutableEnum.immutable;
@@ -127,11 +127,11 @@ class GunGraph {
   ///
   /// @param middleware The middleware function to add
   /// @param kind Optionaly register write middleware instead of read by passing "write"
-  GunGraph use(ChainGunMiddleware middleware,
-      {ChainGunMiddlewareType kind = ChainGunMiddlewareType.read}) {
-    if (kind == ChainGunMiddlewareType.read) {
+  GunGraph use(FlutterGunMiddleware middleware,
+      {FlutterGunMiddlewareType kind = FlutterGunMiddlewareType.read}) {
+    if (kind == FlutterGunMiddlewareType.read) {
       _readMiddleware.add(middleware);
-    } else if (kind == ChainGunMiddlewareType.write) {
+    } else if (kind == FlutterGunMiddlewareType.write) {
       _writeMiddleware.add(middleware);
     }
     return this;
@@ -141,14 +141,14 @@ class GunGraph {
   ///
   /// @param middleware The middleware function to remove
   /// @param kind Optionaly unregister write middleware instead of read by passing "write"
-  GunGraph unuse(ChainGunMiddleware middleware,
-      {ChainGunMiddlewareType kind = ChainGunMiddlewareType.read}) {
-    if (kind == ChainGunMiddlewareType.read) {
+  GunGraph unuse(FlutterGunMiddleware middleware,
+      {FlutterGunMiddlewareType kind = FlutterGunMiddlewareType.read}) {
+    if (kind == FlutterGunMiddlewareType.read) {
       final idx = _readMiddleware.indexOf(middleware);
       if (idx != -1) {
         _readMiddleware.removeAt(idx);
       }
-    } else if (kind == ChainGunMiddlewareType.write) {
+    } else if (kind == FlutterGunMiddlewareType.write) {
       final idx = _writeMiddleware.indexOf(middleware);
       if (idx != -1) {
         _writeMiddleware.removeAt(idx);
@@ -360,7 +360,7 @@ class GunGraph {
   VoidCallback get(String soul, [GunMsgCb? cb, String? msgId]) {
     String id = msgId ?? generateMessageId();
 
-    events.get.trigger(ChainGunGet(cb: cb, msgId: msgId, soul: soul));
+    events.get.trigger(FlutterGunGet(cb: cb, msgId: msgId, soul: soul));
 
     return () => events.off.trigger(id);
   }
@@ -388,7 +388,7 @@ class GunGraph {
       
       // print('Data-->Encoded::Sent:: ${jsonEncode(diff)}');
 
-      events.put.trigger(ChainGunPut(graph: diff!, cb: cb, msgId: id));
+      events.put.trigger(FlutterGunPut(graph: diff!, cb: cb, msgId: id));
 
       _receiveGraphData(diff!);
     })();
@@ -407,7 +407,7 @@ class GunGraph {
     return this;
   }
 
-  /// Update graph data in this chain from some local or external source
+  /// Update graph data in this flutter from some local or external source
   ///
   /// @param data node data to include
   FutureOr<void> _receiveGraphData(GunGraphData data, [String? id, String? replyToId]) async {

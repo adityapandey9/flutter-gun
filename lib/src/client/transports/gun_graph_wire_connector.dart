@@ -1,4 +1,4 @@
-import '../../types/chain_gun.dart';
+import '../../types/flutter_gun.dart';
 import '../../types/generic.dart';
 import '../../types/gun.dart';
 import '../../types/gun_graph_adapter.dart';
@@ -27,30 +27,30 @@ abstract class GunGraphWireConnector extends GunGraphConnector {
   ///
   /// @returns A function to be called to clean up callback listeners
   @override
-  VoidCallback put(ChainGunPut chainGunPut, [dynamic _, dynamic __]) {
-    final GunMsg msg = GunMsg(put: chainGunPut.graph);
-    if (!isNull(chainGunPut.msgId)) {
-      msg.key = chainGunPut.msgId;
+  VoidCallback put(FlutterGunPut flutterGunPut, [dynamic _, dynamic __]) {
+    final GunMsg msg = GunMsg(put: flutterGunPut.graph);
+    if (!isNull(flutterGunPut.msgId)) {
+      msg.key = flutterGunPut.msgId;
     }
-    if (!isNull(chainGunPut.replyTo)) {
-      msg.pos = chainGunPut.replyTo;
+    if (!isNull(flutterGunPut.replyTo)) {
+      msg.pos = flutterGunPut.replyTo;
     }
 
-    return req(msg, chainGunPut.cb);
+    return req(msg, flutterGunPut.cb);
   }
 
   /// Request data for a given soul
   ///
   /// @returns A function to be called to clean up callback listeners
   @override
-  VoidCallback get(ChainGunGet chainGunGet, [dynamic _, dynamic __]) {
-    final GunMsgGet get = GunMsgGet(key: chainGunGet.soul);
+  VoidCallback get(FlutterGunGet flutterGunGet, [dynamic _, dynamic __]) {
+    final GunMsgGet get = GunMsgGet(key: flutterGunGet.soul);
     final GunMsg msg = GunMsg(get: get);
-    if (!isNull(chainGunGet.msgId)) {
-      msg.key = chainGunGet.msgId;
+    if (!isNull(flutterGunGet.msgId)) {
+      msg.key = flutterGunGet.msgId;
     }
 
-    return req(msg, chainGunGet.cb);
+    return req(msg, flutterGunGet.cb);
   }
 
   /// Send a message that expects responses via @

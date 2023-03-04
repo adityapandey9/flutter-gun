@@ -5,7 +5,7 @@ import 'control_flow/gun_event.dart';
 
 typedef FutureOrStringFunc = FutureOr<String> Function(List<String> path);
 
-class GunChainOptions {
+class GunFlutterOptions {
    FutureOrStringFunc? uuid;
 }
 
@@ -20,9 +20,9 @@ class PathData {
    PathData({ required this.souls, this.value, this.complete = false });
 }
 
-typedef ChainGunMiddleware = FutureOr<GunGraphData?> Function(GunGraphData updates, GunGraphData existingGraph);
+typedef FlutterGunMiddleware = FutureOr<GunGraphData?> Function(GunGraphData updates, GunGraphData existingGraph);
 
-enum ChainGunMiddlewareType {
+enum FlutterGunMiddlewareType {
    read,
    write
 }

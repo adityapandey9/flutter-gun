@@ -2,34 +2,34 @@ import 'dart:async';
 
 import '../types/gun_graph_adapter.dart';
 
-import '../types/chain_gun.dart';
+import '../types/flutter_gun.dart';
 import '../types/gun.dart';
-import 'chain_gun_client.dart';
+import 'flutter_gun_client.dart';
 import 'control_flow/gun_event.dart';
 import 'graph/gun_graph_utils.dart';
 import 'interfaces.dart';
 
-class ChainGunLink {
+class FlutterGunLink {
   final String key;
   late String? soul;
 
-  late GunChainOptions _opt;
+  late GunFlutterOptions _opt;
   late final GunEvent<GunValue?, String, dynamic> _updateEvent;
-  late final ChainGunClient _chain;
-  ChainGunLink? _parent;
+  late final FlutterGunClient _flutter;
+  FlutterGunLink? _parent;
   VoidCallback? _endQuery;
   GunValue? _lastValue;
   late bool _hasReceived;
 
-  ChainGunLink(
+  FlutterGunLink(
       {required this.key,
-      required ChainGunClient chain,
-      ChainGunLink? parent}) {
+      required FlutterGunClient flutter,
+      FlutterGunLink? parent}) {
     if (isNull(parent)) {
       soul = key;
     }
-    _opt = GunChainOptions();
-    _chain = chain;
+    _opt = GunFlutterOptions();
+    _flutter = flutter;
     _parent = parent;
     _hasReceived = false;
     _updateEvent =
@@ -49,23 +49,23 @@ class ChainGunLink {
   ///
   /// @param key Key to read data from
   /// @param cb
-  /// @returns New chain context corresponding to given key
-  ChainGunLink get(String key, [GunMsgCb? cb]) {
-    return ChainGunLink(key: key, chain: _chain, parent: this);
+  /// @returns New flutter context corresponding to given key
+  FlutterGunLink get(String key, [GunMsgCb? cb]) {
+    return FlutterGunLink(key: key, flutter: _flutter, parent: this);
   }
 
-  /// Move up to the parent context on the chain.
+  /// Move up to the parent context on the flutter.
   ///
-  /// Every time a new chain is created, a reference to the old context is kept to go back to.
+  /// Every time a new flutter is created, a reference to the old context is kept to go back to.
   ///
-  /// @param amount The number of times you want to go back up the chain. {-1} or {Infinity} will take you to the root.
-  /// @returns a parent chain context
+  /// @param amount The number of times you want to go back up the flutter. {-1} or {Infinity} will take you to the root.
+  /// @returns a parent flutter context
   dynamic back([amount = 1]) {
     if (amount < 0 || amount == double.maxFinite.toInt()) {
-      return _chain;
+      return _flutter;
     }
     if (amount == 1) {
-      return _parent ?? _chain;
+      return _parent ?? _flutter;
     }
     return back(amount - 1);
   }
@@ -77,9 +77,9 @@ class ChainGunLink {
   ///
   /// @param value the data to save
   /// @param cb an optional callback, invoked on each acknowledgment
-  /// @returns same chain context
-  ChainGunLink put(GunValue value, [GunMsgCb? cb]) {
-    _chain.graph!.putPath(getPath(), value, cb, opt().uuid);
+  /// @returns same flutter context
+  FlutterGunLink put(GunValue value, [GunMsgCb? cb]) {
+    _flutter.graph!.putPath(getPath(), value, cb, opt().uuid);
     return this;
   }
 
@@ -91,9 +91,9 @@ class ChainGunLink {
   ///
   /// @param data should be a gun reference or an object
   /// @param cb The callback is invoked exactly the same as .put
-  /// @returns chain context for added object
-  ChainGunLink set(dynamic data, [GunMsgCb? cb]) {
-    if (data is ChainGunLink && !isNull(data.soul)) {
+  /// @returns flutter context for added object
+  FlutterGunLink set(dynamic data, [GunMsgCb? cb]) {
+    if (data is FlutterGunLink && !isNull(data.soul)) {
       final temp = {};
       temp[data.soul] = {'#': data.soul};
       put(temp, cb);
@@ -114,8 +114,8 @@ class ChainGunLink {
   /// It will consult the connected peers and invoke the callback if there's reasonable certainty that none of them have the data available.
   ///
   /// @param cb If there's reason to believe the data doesn't exist, the callback will be invoked. This can be used as a check to prevent implicitly writing data
-  /// @returns same chain context
-  ChainGunLink not(void Function(String key) cb) {
+  /// @returns same flutter context
+  FlutterGunLink not(void Function(String key) cb) {
     promise().then((val) {
       if (isNull(val)) {
         cb(key);
@@ -124,11 +124,11 @@ class ChainGunLink {
     return this;
   }
 
-  /// Change the configuration of this chain link
+  /// Change the configuration of this flutter link
   ///
   /// @param options
   /// @returns current options
-  GunChainOptions opt([GunChainOptions? options]) {
+  GunFlutterOptions opt([GunFlutterOptions? options]) {
     if (!isNull(options)) {
       _opt = options!;
     }
@@ -140,9 +140,9 @@ class ChainGunLink {
 
   /// Get the current data without subscribing to updates. Or undefined if it cannot be found.
   ///
-  /// @param cb The data is the value for that chain at that given point in time. And the key is the last property name or ID of the node.
-  /// @returns same chain context
-  ChainGunLink once(GunOnCb cb) {
+  /// @param cb The data is the value for that flutter at that given point in time. And the key is the last property name or ID of the node.
+  /// @returns same flutter context
+  FlutterGunLink once(GunOnCb cb) {
     promise().then((val) => cb(val, key));
     return this;
   }
@@ -155,15 +155,15 @@ class ChainGunLink {
   /// To remove a listener call .off() on the same property or node.
   ///
   /// @param cb The callback is immediately fired with the data as it is at that point in time.
-  /// @returns same chain context
-  ChainGunLink on(GunOnCb cb) {
+  /// @returns same flutter context
+  FlutterGunLink on(GunOnCb cb) {
     if (key == '') {
       // TODO: "Map logic"
     }
 
     _updateEvent.on(cb);
     if (isNull(_endQuery)) {
-      _endQuery = _chain.graph!.query(getPath(), _onQueryResponse);
+      _endQuery = _flutter.graph!.query(getPath(), _onQueryResponse);
     }
     if (_hasReceived) {
       cb(_lastValue, key);
@@ -173,8 +173,8 @@ class ChainGunLink {
 
   /// Unsubscribe one or all listeners subscribed with on
   ///
-  /// @returns same chain context
-  ChainGunLink off([GunOnCb? cb]) {
+  /// @returns same flutter context
+  FlutterGunLink off([GunOnCb? cb]) {
     if (!isNull(cb)) {
       _updateEvent.off(cb!);
       if (!isNull(_endQuery) && _updateEvent.listenerCount() == 0) {
@@ -209,45 +209,45 @@ class ChainGunLink {
     return promise().then(fn);
   }
 
-  /// Iterates over each property and item on a node, passing it down the chain
+  /// Iterates over each property and item on a node, passing it down the flutter
   ///
   /// Not yet supported
   ///
   /// Behaves like a forEach on your data.
   /// It also subscribes to every item as well and listens for newly inserted items.
   ///
-  /// @returns a new chain context holding many chains simultaneously.
-  ChainGunLink map() {
+  /// @returns a new flutter context holding many flutters simultaneously.
+  FlutterGunLink map() {
     throw ("map() isn't supported yet");
   }
 
   /// No plans to support this
-  ChainGunLink path(String path) {
+  FlutterGunLink path(String path) {
     throw ('No plans to support this');
   }
 
   /// No plans to support this
-  ChainGunLink open(dynamic cb) {
+  FlutterGunLink open(dynamic cb) {
     throw ('No plans to support this');
   }
 
   /// No plans to support this
-  ChainGunLink load(dynamic cb) {
+  FlutterGunLink load(dynamic cb) {
     throw ('No plans to support this');
   }
 
   /// No plans to support this
-  ChainGunLink bye() {
+  FlutterGunLink bye() {
     throw ('No plans to support this');
   }
 
   /// No plans to support this
-  ChainGunLink later() {
+  FlutterGunLink later() {
     throw ('No plans to support this');
   }
 
   /// No plans to support this
-  ChainGunLink unset(GunNode node) {
+  FlutterGunLink unset(GunNode node) {
     throw ('No plans to support this');
   }
 

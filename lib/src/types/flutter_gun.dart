@@ -3,23 +3,23 @@ import 'gun.dart';
 typedef GunMsgCb = void Function(GunMsg msg);
 typedef LexicalFunc = dynamic Function(GunValue x);
 
-/// How puts are communicated to ChainGun connectors
-class ChainGunPut {
+/// How puts are communicated to FlutterGun connectors
+class FlutterGunPut {
   late GunGraphData graph;
   String? msgId;
   String? replyTo;
   GunMsgCb? cb;
 
-  ChainGunPut({ required this.graph, this.msgId, this.replyTo, this.cb });
+  FlutterGunPut({ required this.graph, this.msgId, this.replyTo, this.cb });
 }
 
-/// How gets are communicated to ChainGun connectors
-class ChainGunGet {
+/// How gets are communicated to FlutterGun connectors
+class FlutterGunGet {
   late String soul;
   String? msgId;
   String? key;
   GunMsgCb? cb;
-  ChainGunGet({ required this.soul, this.msgId, this.key, this.cb });
+  FlutterGunGet({ required this.soul, this.msgId, this.key, this.cb });
 }
 
 class CrdtOption {

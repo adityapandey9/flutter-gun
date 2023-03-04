@@ -38,24 +38,24 @@ Future<AuthenticateReturnDataType?> authenticateAccount(
 }
 
 Future<AuthenticateReturnDataType?> authenticateIdentity(
-    ChainGunSeaClient chaingun,
+    FlutterGunSeaClient fluttergun,
     String soul,
     String password,
     [String encoding = 'base64']
     ) async {
-  final ident = await chaingun.getValue(soul);
+  final ident = await fluttergun.getValue(soul);
   print('\n\n\n:: authenticateIdentity:::: ${jsonEncode(ident)} \n');
   return authenticateAccount(ident, password, encoding);
 }
 
 Future<AuthenticateReturnDataType> authenticate(
-    ChainGunSeaClient chaingun,
+    FlutterGunSeaClient fluttergun,
     String alias,
     String password,
     [Map<String, dynamic> _opt = DEFAULT_OPTS]
     ) async {
   final aliasSoul = "~@$alias";
-  final idents = await chaingun.getValue(aliasSoul);
+  final idents = await fluttergun.getValue(aliasSoul);
 
   print('\n----\nIndent:: ${jsonEncode(idents)}');
 
@@ -71,7 +71,7 @@ Future<AuthenticateReturnDataType> authenticate(
     print("Soul:: $soul");
 
     try {
-      pair = await authenticateIdentity(chaingun, soul, password);
+      pair = await authenticateIdentity(fluttergun, soul, password);
     } catch (e) {
       if (kDebugMode) {
         print("Error During authenticate: ${e.toString()}");

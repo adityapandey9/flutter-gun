@@ -4,7 +4,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../crdt/index.dart';
 import '../../types/gun.dart';
-import '../chain_gun_link.dart';
+import '../flutter_gun_link.dart';
 import '../interfaces.dart';
 import 'gun_graph_node.dart';
 
@@ -67,7 +67,7 @@ GunGraphData nodeToGraph(GunNode node) {
       soul = val.nodeMetaData!.key!;
     }
 
-    if (val is ChainGunLink && val.soul != null && val.soul!.isNotEmpty) {
+    if (val is FlutterGunLink && val.soul != null && val.soul!.isNotEmpty) {
       soul = val.soul!;
     }
 

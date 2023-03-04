@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import '../types/chain_gun.dart';
+import '../types/flutter_gun.dart';
 import '../types/enum.dart';
 import '../types/gun.dart';
 

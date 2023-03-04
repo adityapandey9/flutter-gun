@@ -53,15 +53,15 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   String gundbText = '';
   TextEditingController gunDBTestingController = TextEditingController();
-  late ChainGunLink copy;
+  late FlutterGunLink copy;
 
   @override
   void initState() {
     super.initState();
-    ChainGunOptions chainGunOptions = ChainGunOptions();
+    FlutterGunOptions chainGunOptions = FlutterGunOptions();
     const isLocal = true;
     chainGunOptions.peers = [ isLocal ? 'ws://localhost:8080/gun' : 'wss://gun-manhattan.herokuapp.com/gun'];
-    final chainGunClient = ChainGunSeaClient(chainGunOptions: chainGunOptions);
+    final chainGunClient = FlutterGunSeaClient(flutterGunOptions: chainGunOptions);
 
     copy = chainGunClient.get('filegot2');
 
@@ -82,32 +82,39 @@ class _MyHomePageState extends State<MyHomePage> {
 
     doingMaybe.on((a, [b, c]) async {
       print('doingMaybe:: $a');
+
+      /** Below is just an basic example **/
+
       final pairVar = await pair();
       var enc = await encrypt('hello self', pairVar);
-      print('Encr:: $enc');
-      var data = await sign('Hello, YO!!', pairVar);
-      print('Data:: $data');
+      print('encrypt:: $enc');
+      var data = await sign(enc, pairVar);
+      print('signed:: $data');
 
       var msg = await verify(data, pairVar);
-      print('Verifying:: $msg');
+      print('verify:: $msg');
       var dec = await decrypt(msg, pairVar);
       var proof = await work(dec, pairVar);
       var check = await work('hello self', pairVar);
       print('Decrypt MSG:: $dec');
-      print('Val:: ${proof == check} -- $proof -- $check');
+      print('Check:: ${proof == check} -- $proof -- $check');
+
+      /** Below code is for the sharing data encrypted between two users **/
 
       var alice = await pair();
       var bob = await pair();
       var shared = await secret(bob.epub, alice);
-      print('\nSharedd:: $shared');
+      print('shared secret:: $shared');
       var shared_enc = await encrypt('shared data', shared);
-      print('\nshared_enc :: $shared_enc');
+      print('shared_enc :: $shared_enc');
 
       var decryptKey = await secret(alice.epub, bob);
-      print('\decryptKey:: $decryptKey');
+      print('decryptKey:: $decryptKey');
 
       var dec2 = await decrypt(shared_enc, decryptKey);
-      print('\n\nDecrpted Data:: $dec2');
+      print('Decrypted Data:: $dec2');
+
+      /** Below Example code not yet done, Currently implementing it  **/
 
       // var certificate = await certify(alice.pub, ["^AliceOnly.*"], bob);
 

@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 
-import '../../types/chain_gun.dart';
+import '../../types/flutter_gun.dart';
 import '../../types/gun.dart';
 import '../control_flow/gun_event.dart';
 import '../control_flow/gun_process_queue.dart';
@@ -83,14 +83,14 @@ abstract class GunGraphConnector {
   /// Send graph data for one or more nodes
   ///
   /// @returns A function to be called to clean up callback listeners
-  VoidCallback put(ChainGunPut params, [dynamic _, dynamic __]) {
+  VoidCallback put(FlutterGunPut params, [dynamic _, dynamic __]) {
     return () {};
   }
 
   /// Request data for a given soul
   ///
   /// @returns A function to be called to clean up callback listeners
-  VoidCallback get(ChainGunGet params, [dynamic _, dynamic __]) {
+  VoidCallback get(FlutterGunGet params, [dynamic _, dynamic __]) {
     return () => {};
   }
 

@@ -7,7 +7,7 @@ import '../types/gun.dart';
 import '../types/sear/types.dart';
 
 Future<CreateUserReturnType> createUser(
-    ChainGunSeaClient chaingun, String alias, String password) async {
+    FlutterGunSeaClient fluttergun, String alias, String password) async {
   final aliasSoul = "~@$alias";
 
   // "pseudo-randomly create a salt, then use PBKDF2 function to extend the password with it."
@@ -47,9 +47,9 @@ Future<CreateUserReturnType> createUser(
   final graph = await signGraph(tempGraph, pair);
 
   await () async {
-    final tempNodePut = chaingun.get(pubSoul);
+    final tempNodePut = fluttergun.get(pubSoul);
     tempNodePut.put(graph[pubSoul]);
-    final tempPut = chaingun.get(aliasSoul);
+    final tempPut = fluttergun.get(aliasSoul);
     tempPut.put({'#': pubSoul});
   }();
 

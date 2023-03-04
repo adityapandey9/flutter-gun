@@ -7,7 +7,7 @@ import '../sear/authenticate.dart';
 import '../sear/create_user.dart';
 import '../sear/sign.dart';
 import '../types/gun.dart';
-import 'chain_gun_sea_client.dart';
+import 'flutter_gun_sea_client.dart';
 
 class UserReference {
   String alias;
@@ -74,13 +74,13 @@ typedef SignMiddleWareFnType = FutureOr<GunGraphData> Function(
 const DEFAULT_CREATE_OPTS = {};
 const DEFAULT_AUTH_OPTS = {};
 
-class ChainGunUserApi {
-  late ChainGunSeaClient _gun;
+class FlutterGunUserApi {
+  late FlutterGunSeaClient _gun;
   UserReference? isu;
   SignMiddleWareFnType? _signMiddleware;
 
-  ChainGunUserApi({required ChainGunSeaClient chainGunSeaClient}) {
-    _gun = chainGunSeaClient;
+  FlutterGunUserApi({required FlutterGunSeaClient flutterGunSeaClient}) {
+    _gun = flutterGunSeaClient;
   }
 
   ///
@@ -144,9 +144,9 @@ class ChainGunUserApi {
   }
 
   /// https://gun.eco/docs/User#user-leave
-  ChainGunUserApi leave() {
+  FlutterGunUserApi leave() {
     if (_signMiddleware != null) {
-      _gun.graph!.unuse(_signMiddleware!, kind: ChainGunMiddlewareType.write);
+      _gun.graph!.unuse(_signMiddleware!, kind: FlutterGunMiddlewareType.write);
       _signMiddleware = null;
       isu = null;
     }
@@ -161,7 +161,7 @@ class ChainGunUserApi {
         priv: credentials.priv,
         epriv: credentials.epriv,
         epub: credentials.epub));
-    _gun.graph!.use(_signMiddleware!, kind: ChainGunMiddlewareType.write);
+    _gun.graph!.use(_signMiddleware!, kind: FlutterGunMiddlewareType.write);
 
     return (isu =
         UserReference.from(alias: credentials.alias, pub: credentials.pub));
