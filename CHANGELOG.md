@@ -1,3 +1,4 @@
-## 0.0.1
+## 0.0.3
 
-* TODO: Describe initial release.
+* Added Local Storage for offline use case.
+* Add Encryption Sharing between two user with example.
