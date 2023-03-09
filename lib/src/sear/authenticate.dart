@@ -44,7 +44,6 @@ Future<AuthenticateReturnDataType?> authenticateIdentity(
     [String encoding = 'base64']
     ) async {
   final ident = await fluttergun.getValue(soul);
-  print('\n\n\n:: authenticateIdentity:::: ${jsonEncode(ident)} \n');
   return authenticateAccount(ident, password, encoding);
 }
 
@@ -57,18 +56,12 @@ Future<AuthenticateReturnDataType> authenticate(
   final aliasSoul = "~@$alias";
   final idents = await fluttergun.getValue(aliasSoul);
 
-  print('\n----\nIndent:: ${jsonEncode(idents)}');
-
   for (var soul in (idents is Map ? idents : {}).keys) {
     if (soul == '_') {
       continue;
     }
 
     var pair;
-
-    // soul = "$aliasSoul/$soul";
-
-    print("Soul:: $soul");
 
     try {
       pair = await authenticateIdentity(fluttergun, soul, password);

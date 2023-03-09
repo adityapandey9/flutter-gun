@@ -4,6 +4,11 @@ This library is a port of GunDB js for the Dart and Flutter. P2P encrypted Commu
 GUN is an ecosystem of tools that let you build community run and encrypted applications - like an Open Source Firebase or a Decentralized Dropbox.
 
 `Note: Some APIs like certify and user, not implemented completely (Trying to do so ;) )`
+
+### Demo
+
+![Demo Gif](https://raw.githubusercontent.com/adityapandey9/flutter-gun/master/demo.gif)
+
 ## Features
 
 1. Multiplayer by default with realtime p2p state synchronization!
@@ -26,7 +31,7 @@ or
 ```yaml
 .....
 dependencies:
-  flutter_gundb: ^0.0.2
+  flutter_gundb: ^0.0.3
 ....
 ```
 
@@ -52,16 +57,33 @@ void main() {
 
 ```
 
+Example on how to store the data locally.
+
+```dart
+import 'package:flutter_gundb/flutter_gundb.dart';
+
+void main() async {
+    await initializeFlutterGun();
+    final chainGunClient = FlutterGunSeaClient(registerStorage: true);
+    
+    final localFirstStorage = gun.get('local-first-storage');
+    localFirstStorage.put({
+      name: "Testing the Local First",
+      anime_website: "animeloved.com",
+    });
+    localFirstStorage.on((a, [b, c]) {
+      print('Getting Value:: $a');
+    });
+}
+
+```
+
 Example How to send other user encrypted data
 
 ```dart
 import 'package:flutter_gundb/flutter_gundb.dart';
 
-void main() {
-    final chainGunClient = FlutterGunSeaClient();
-    
-    final getAditya = gun.get('aditya');
-
+void main() {   
     () async {
       var aditya = await pair();
       var pandey = await pair();
@@ -78,14 +100,6 @@ void main() {
       var decryptedData = await decrypt(shared_enc, decryptKey);
       
       // `decryptedData` This is your Decrypted Data
-      
-      getAditya.put({
-        name: "Aditya Kumar Pandey",
-        email: "janatig@janatig.com",
-      });
-      getAditya.on((a, [b, c]) {
-        print('Getting Value:: $a');
-      });
     } ();
 }
 
