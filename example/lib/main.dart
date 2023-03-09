@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gundb/flutter_gundb.dart';
 
-void main() {
+void main() async {
+
+  await initializeFlutterGun();
+
   runApp(const MyApp());
 }
 
@@ -56,10 +59,10 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    FlutterGunOptions chainGunOptions = FlutterGunOptions();
+    FlutterGunOptions flutterGunOptions = FlutterGunOptions();
     const isLocal = true;
-    chainGunOptions.peers = [ isLocal ? 'ws://localhost:8080/gun' : 'wss://gun-manhattan.herokuapp.com/gun'];
-    final chainGunClient = FlutterGunSeaClient(flutterGunOptions: chainGunOptions);
+    flutterGunOptions.peers = [ isLocal ? 'ws://localhost:8080/gun' : 'wss://gun-manhattan.herokuapp.com/gun'];
+    final chainGunClient = FlutterGunSeaClient(flutterGunOptions: flutterGunOptions, registerStorage: true);
 
     copy = chainGunClient.get('filegot2');
 
